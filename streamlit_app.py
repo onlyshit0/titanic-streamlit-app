@@ -169,11 +169,11 @@ if st.sidebar.button("预测生存概率"):
     """, unable_allow_html=True)
         else:
             st.markdown(f"""
-    <div class="prediction-box perished">
-             预测结果：未生还<br>
-        <span style="font-size:16px;">生存概率: {probability:.2%}</span>
-    </div>
-    """, unsafe_allow_html=True)
+                <div class="prediction-box perished">
+                    ❌ 预测结果：未生还<br>
+                    <span style="font-size:16px;">生存概率: {probability:.2%}</span>
+                </div>
+            """, unsafe_allow_html=True)
 
     with col2:
         st.metric(label="生存概率", value=f"{probability:.2%}")

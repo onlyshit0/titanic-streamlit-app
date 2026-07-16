@@ -206,8 +206,8 @@ if st.sidebar.button("预测生存概率"):
         st.pyplot(fig)
         plt.clf()
        
-except Exception as e:
-    st.warning(f"SHAP 图生成失败: {e}")
+    except Exception as e:
+        st.warning(f"SHAP 图生成失败: {e}")
 
 st.sidebar.markdown("--")
 st.sidebar.subheader("快速体验")

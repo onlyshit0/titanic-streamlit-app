@@ -182,7 +182,7 @@ st.sidebar.markdown("--")
 st.sidebar.subheader("快速体验")
 
 col1, col2 = st.sidebar.columns(2)
-if col1.button("女性 头等舱")：
+if col1.button("女性 头等舱"):
     st.session_state.pclass = 1
     st.session_state.sex = "男性"
     st.session_state.age = 25

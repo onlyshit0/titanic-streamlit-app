@@ -104,18 +104,19 @@ st.sidebar.success("模型加载成功")
 
 st.sidebar.header("乘客信息")
 
-pclass = st.sidebar.selectbox("舱位等级 （Pclass）", [1, 2, 3], format_func=lambda x: {1: "头等舱", 2:"二等舱", 3:"三等舱"}[x])
-sex = st.sidebar.selectbox("性别（Sex）", ["男性","女性"])
-age = st.sidebar.slider("年龄(Age)",0, 80, 25)
-sibsp = st.sidebar.number_input("兄弟姐妹/配偶数(SibSp)", min_value=0, max_value=8, value=0, step=1)
-parch = st.sidebar.number_input("父母/子女数(Parch)", min_value=0, max_value=6, value=0, step=1)
-fare = st.sidebar.number_input("船票价格(Fare)", min_value=0.0, max_value=512.0, value=32.0, step=1.0)
-embarked = st.sidebar.selectbox("登船港口（Embarked）", ["南安普顿（S）", "瑟堡(C)", "皇后镇(Q)"])
+pclass = st.sidebar.selectbox("舱位等级 (Pclass)", [1, 2, 3], 
+    format_func=lambda x: {1: "头等舱", 2: "二等舱", 3: "三等舱"}[x])
+sex = st.sidebar.selectbox("性别 (Sex)", ["男性", "女性"])
+age = st.sidebar.slider("年龄 (Age)", 0, 80, 25)
+sibsp = st.sidebar.number_input("兄弟姐妹/配偶数 (SibSp)", min_value=0, max_value=8, value=0, step=1)
+parch = st.sidebar.number_input("父母/子女数 (Parch)", min_value=0, max_value=6, value=0, step=1)
+fare = st.sidebar.number_input("船票价格 (Fare)", min_value=0.0, max_value=512.0, value=32.0, step=1.0)
+embarked = st.sidebar.selectbox("登船港口 (Embarked)", ["南安普顿 (S)", "瑟堡 (C)", "皇后镇 (Q)"])
 
 family_size = sibsp + parch + 1
 is_alone = 1 if family_size == 1 else 0
 
-if age <=12:
+if age <= 12:
     age_bin = "儿童"
 elif age <= 18:
     age_bin = "青少年"
@@ -124,24 +125,18 @@ elif age <= 35:
 elif age <= 60:
     age_bin = "中年"
 else:
-    age_bin="老年"
+    age_bin = "老年"
 
 if fare <= 8.0:
-    fare_bin ="低"
+    fare_bin = "低"
 elif fare <= 15.0:
     fare_bin = "中低"
-elif fare <=31.0:
+elif fare <= 31.0:
     fare_bin = "中高"
 else:
     fare_bin = "高"
 
-sex_map = {"男性": 1, "女性": 0}
-embarked_map = {"南安普顿 (S)": 0, "瑟堡 (C)": 1, "皇后镇 (Q)": 2}
-age_bin_map = {"儿童": 0, "青少年": 1, "青年": 2, "中年": 3, "老年": 4}
-fare_bin_map = {"低": 0, "中低": 1, "中高": 2, "高": 3}
-
-# ========== 预测按钮 ==========
-if st.sidebar.button("🚀 预测生存概率", type="primary"):
+if st.sidebar.button(" 预测生存概率", type="primary"):
     input_data = pd.DataFrame({
         'pclass': [pclass],
         'sex': [sex_map[sex]],
@@ -179,7 +174,6 @@ if st.sidebar.button("🚀 预测生存概率", type="primary"):
     with col2:
         st.metric(label="生存概率", value=f"{probability:.2%}")
 
-    # ========== SHAP 瀑布图 ==========
     st.subheader("🔍 预测解释（SHAP 瀑布图）")
 
     try:
@@ -193,7 +187,6 @@ if st.sidebar.button("🚀 预测生存概率", type="primary"):
 
         feature_names = input_data.columns.tolist()
         
-        # 如果是二分类，取第二个
         if isinstance(shap_values, list):
             values = shap_values[1][0]
         else:

@@ -226,7 +226,7 @@ try:
     sorted_names = [feature_names[i] for i in sorted_idx]
     sorted_balues = [values[i] for i in sorted_idx]
 
-    colors =['red', if v < 0 else 'blue' for v in sorted_values]
+    colors =['red' if v < 0 else 'blue' for v in sorted_values]
     plt.barh(sorted_names, sorted_values, color=colors, alpha=0.7)
     plt.axvline(x=0, color='black', linestyle='-', linewidth=0.5)
     plt.xlabel('SHAP 值 → 降低生存概率，正值 → 提高生存概率）')

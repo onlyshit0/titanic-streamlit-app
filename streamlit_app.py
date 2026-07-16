@@ -211,8 +211,6 @@ age = st.slider("年龄", 0, 80, 25, key="age")
 st.subheader("预测解释（SHAP）瀑布图")
 
 try:
-    import shap
-    import matpltlib.pyplot as plt
 
     explainer = shap.TreeExplainer(model)
     shap_values = explainer.shap_values(input_data)

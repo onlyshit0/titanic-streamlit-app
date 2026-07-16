@@ -135,13 +135,13 @@ elif fare <=31.0:
 else:
     fare_bin = "高"
 
-sex_map = {"男性":1, "女性":0}
-embarked_map = {"南安普顿（S）":0, "瑟堡(C)":1, "皇后镇(Q)":2}
-age_bin_map = {"儿童":0, "青少年":1, "青年":2, "中年":3, "老年":4}
-fare_bin_map = {"低":0, "中低":1, "中高":2, "高":3}
+sex_map = {"男性": 1, "女性": 0}
+embarked_map = {"南安普顿 (S)": 0, "瑟堡 (C)": 1, "皇后镇 (Q)": 2}
+age_bin_map = {"儿童": 0, "青少年": 1, "青年": 2, "中年": 3, "老年": 4}
+fare_bin_map = {"低": 0, "中低": 1, "中高": 2, "高": 3}
 
-if st.sidebar.button("预测生存概率"):
-
+# ========== 预测按钮 ==========
+if st.sidebar.button("🚀 预测生存概率", type="primary"):
     input_data = pd.DataFrame({
         'pclass': [pclass],
         'sex': [sex_map[sex]],
@@ -162,27 +162,29 @@ if st.sidebar.button("预测生存概率"):
     col1, col2 = st.columns(2)
     with col1:
         if prediction == 1:
-            st.markdown(f"""<div class="prediction-box survived">
-             预测结果：生还<br>
-        <span style="font-size:16px;">生存概率: {probability:.2%}</span>
-    </div>
-    """, unable_allow_html=True)
+            st.markdown(f"""
+                <div class="prediction-box survived">
+                    ✅ 预测结果：生还<br>
+                    <span style="font-size:16px;">生存概率: {probability:.2%}</span>
+                </div>
+            """, unsafe_allow_html=True)
         else:
             st.markdown(f"""
-    <div class="prediction-box perished">
-             预测结果：未生还<br>
-        <span style="font-size:16px;">生存概率: {probability:.2%}</span>
-    </div>
-    """, unsafe_allow_html=True)
+                <div class="prediction-box perished">
+                    ❌ 预测结果：未生还<br>
+                    <span style="font-size:16px;">生存概率: {probability:.2%}</span>
+                </div>
+            """, unsafe_allow_html=True)
 
     with col2:
         st.metric(label="生存概率", value=f"{probability:.2%}")
-        
 
-
-    st.subheader("预测解释（SHAP）瀑布图")
+    # ========== SHAP 瀑布图 ==========
+    st.subheader("🔍 预测解释（SHAP 瀑布图）")
 
     try:
+        import shap
+        import matplotlib.pyplot as plt
 
         explainer = shap.TreeExplainer(model)
         shap_values = explainer.shap_values(input_data)
@@ -190,22 +192,27 @@ if st.sidebar.button("预测生存概率"):
         fig, ax = plt.subplots(figsize=(10, 5))
 
         feature_names = input_data.columns.tolist()
-        values = shap_values[0]
+        
+        # 如果是二分类，取第二个
+        if isinstance(shap_values, list):
+            values = shap_values[1][0]
+        else:
+            values = shap_values[0]
 
         sorted_idx = np.argsort(np.abs(values))[::-1]
         sorted_names = [feature_names[i] for i in sorted_idx]
-        sorted_balues = [values[i] for i in sorted_idx]
+        sorted_values = [values[i] for i in sorted_idx]
 
-        colors =['red' if v < 0 else 'blue' for v in sorted_values]
+        colors = ['red' if v > 0 else 'blue' for v in sorted_values]
         plt.barh(sorted_names, sorted_values, color=colors, alpha=0.7)
         plt.axvline(x=0, color='black', linestyle='-', linewidth=0.5)
-        plt.xlabel('SHAP 值 → 降低生存概率，正值 → 提高生存概率）')
+        plt.xlabel('SHAP 值（负值 → 降低生存概率，正值 → 提高生存概率）')
         plt.title('每个特征对预测结果的贡献')
         plt.tight_layout()
 
         st.pyplot(fig)
         plt.clf()
-       
+
     except Exception as e:
         st.warning(f"SHAP 图生成失败: {e}")
 

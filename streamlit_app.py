@@ -208,7 +208,7 @@ pclass = st.selectbox("舱位等级", [1, 2, 3], key="pclass")
 sex = st.selectbox("性别", ["男性", "女性"], key="sex")
 age = st.slider("年龄", 0, 80, 25, key="age")
 
-        st.subheader("预测解释（SHAP）瀑布图")
+st.subheader("预测解释（SHAP）瀑布图")
 
     try:
         import shap

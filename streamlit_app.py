@@ -204,7 +204,7 @@ if col2.button("男性 三等舱"):
 
 st.markdown("---")
 
-pclass = st.selectbox("舱位等级"， [1, 2, 3], key="pclass")
+pclass = st.selectbox("舱位等级", [1, 2, 3], key="pclass")
 sex = st.selectbox("性别", ["男性", "女性"], key="sex")
 age = st.slider("年龄", 0, 80, 25, key="age")
 

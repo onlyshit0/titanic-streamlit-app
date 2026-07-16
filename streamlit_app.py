@@ -242,4 +242,4 @@ if col2.button(" 男性 三等舱"):
     st.rerun()
 
 st.sidebar.markdown("---")
-st.sidebar.caption(" 基于 XGBoost 模型 | 数据来自 Kaggle Titanic"
+st.sidebar.caption(" 基于 XGBoost 模型 | 数据来自 Kaggle Titanic")

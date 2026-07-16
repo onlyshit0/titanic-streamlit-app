@@ -8,16 +8,15 @@ import shap
 import xgboost as xgb
 
 st.set_page_config(
-    page_title = '泰坦尼克号生存预测',
+    page_title='泰坦尼克号生存预测',
     page_icon="",
     layout="wide",
-    initial_sidebar_state = "expanded"
+    initial_sidebar_state="expanded"
 )
 
 st.title("泰坦尼克号生存预测")
 st.markdown("""
     <style>
-    /* 主标题样式 */
     .main-title {
         font-size: 3rem;
         font-weight: bold;
@@ -27,8 +26,6 @@ st.markdown("""
         text-align: center;
         padding: 1rem 0;
     }
-    
-    /* 卡片样式 */
     .card {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         padding: 1.5rem;
@@ -36,8 +33,6 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin: 0.5rem 0;
     }
-    
-    /* 结果卡片 */
     .result-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 1.5rem;
@@ -46,13 +41,10 @@ st.markdown("""
         text-align: center;
         box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
     }
-    
     .result-card h2 {
         color: white;
         margin: 0;
     }
-    
-    /* 存活/死亡标签 */
     .survived {
         background: linear-gradient(135deg, #00b09b, #96c93d);
         padding: 0.5rem 2rem;
@@ -62,7 +54,6 @@ st.markdown("""
         font-size: 1.5rem;
         display: inline-block;
     }
-    
     .deceased {
         background: linear-gradient(135deg, #cb2d3e, #ef473a);
         padding: 0.5rem 2rem;
@@ -72,25 +63,35 @@ st.markdown("""
         font-size: 1.5rem;
         display: inline-block;
     }
-    
-    /* 进度条样式 */
     .stProgress > div > div > div > div {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
-    
-    /* 侧边栏样式 */
     .sidebar-info {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         padding: 1rem;
         border-radius: 10px;
         margin: 0.5rem 0;
     }
-    
-    /* 统计数字样式 */
     .stat-number {
         font-size: 2.5rem;
         font-weight: bold;
         color: #667eea;
+    }
+    .prediction-box {
+        padding: 1rem 2rem;
+        border-radius: 15px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 1rem 0;
+    }
+    .survived {
+        background: linear-gradient(135deg, #00b09b, #96c93d);
+        color: white;
+    }
+    .perished {
+        background: linear-gradient(135deg, #cb2d3e, #ef473a);
+        color: white;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -100,9 +101,9 @@ def load_model():
     return joblib.load('titanic_xgb_model.pkl')
 
 model = load_model()
-st.sidebar.success("模型加载成功")
+st.sidebar.success(" 模型加载成功")
 
-st.sidebar.header("乘客信息")
+st.sidebar.header(" 乘客信息")
 
 pclass = st.sidebar.selectbox("舱位等级 (Pclass)", [1, 2, 3], 
     format_func=lambda x: {1: "头等舱", 2: "二等舱", 3: "三等舱"}[x])
@@ -136,6 +137,11 @@ elif fare <= 31.0:
 else:
     fare_bin = "高"
 
+sex_map = {"男性": 1, "女性": 0}
+embarked_map = {"南安普顿 (S)": 0, "瑟堡 (C)": 1, "皇后镇 (Q)": 2}
+age_bin_map = {"儿童": 0, "青少年": 1, "青年": 2, "中年": 3, "老年": 4}
+fare_bin_map = {"低": 0, "中低": 1, "中高": 2, "高": 3}
+
 if st.sidebar.button(" 预测生存概率", type="primary"):
     input_data = pd.DataFrame({
         'pclass': [pclass],
@@ -159,14 +165,14 @@ if st.sidebar.button(" 预测生存概率", type="primary"):
         if prediction == 1:
             st.markdown(f"""
                 <div class="prediction-box survived">
-                    ✅ 预测结果：生还<br>
+                     预测结果：生还<br>
                     <span style="font-size:16px;">生存概率: {probability:.2%}</span>
                 </div>
             """, unsafe_allow_html=True)
         else:
             st.markdown(f"""
                 <div class="prediction-box perished">
-                    ❌ 预测结果：未生还<br>
+                     预测结果：未生还<br>
                     <span style="font-size:16px;">生存概率: {probability:.2%}</span>
                 </div>
             """, unsafe_allow_html=True)
@@ -174,7 +180,7 @@ if st.sidebar.button(" 预测生存概率", type="primary"):
     with col2:
         st.metric(label="生存概率", value=f"{probability:.2%}")
 
-    st.subheader("🔍 预测解释（SHAP 瀑布图）")
+    st.subheader(" 预测解释（SHAP 瀑布图）")
 
     try:
         import shap
@@ -209,31 +215,31 @@ if st.sidebar.button(" 预测生存概率", type="primary"):
     except Exception as e:
         st.warning(f"SHAP 图生成失败: {e}")
 
-st.sidebar.markdown("--")
-st.sidebar.subheader("快速体验")
+st.sidebar.markdown("---")
+st.sidebar.subheader(" 快速体验")
 
 col1, col2 = st.sidebar.columns(2)
-if col1.button("女性 头等舱"):
+
+
+if col1.button(" 女性 头等舱"):
     st.session_state.pclass = 1
-    st.session_state.sex = "男性"
-    st.session_state.age = 25
-    st.session_state.fare = 8.0
+    st.session_state.sex = "女性"
+    st.session_state.age = 30
+    st.session_state.fare = 100.0
     st.session_state.sibsp = 0
     st.session_state.parch = 0
-    st.session_state.embarked = "南安普顿(S)"
+    st.session_state.embarked = "南安普顿 (S)"
     st.rerun()
 
-if col2.button("男性 三等舱"):
+if col2.button(" 男性 三等舱"):
     st.session_state.pclass = 3
     st.session_state.sex = "男性"
     st.session_state.age = 25
     st.session_state.fare = 8.0
     st.session_state.sibsp = 0
     st.session_state.parch = 0
-    st.session_state.embarked = "南安普顿(S)"
+    st.session_state.embarked = "南安普顿 (S)"
     st.rerun()
 
-st.markdown("---")
-
 st.sidebar.markdown("---")
-st.sidebar.caption("基于 XGBoost 模型 | 数据来自 Kaggle Titanic")
+st.sidebar.caption(" 基于 XGBoost 模型 | 数据来自 Kaggle Titanic"

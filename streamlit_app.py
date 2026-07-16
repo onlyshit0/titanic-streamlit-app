@@ -162,37 +162,84 @@ if st.sidebar.button("预测生存概率"):
     col1, col2 = st.columns(2)
     with col1:
         if prediction == 1:
-            st.success(f"预测结果：**生还**")
+            st.markdown(f"""<div class="prediction-box survived">
+        ✅ 预测结果：生还<br>
+        <span style="font-size:16px;">生存概率: {probability:.2%}</span>
+    </div>
+    """, unable_allow_html=True)
         else:
-            st.error(f"预测结果：**未生还**")
+            st.markdown(f"""
+    <div class="prediction-box perished">
+        ❌ 预测结果：未生还<br>
+        <span style="font-size:16px;">生存概率: {probability:.2%}</span>
+    </div>
+    """, unsafe_allow_html=True)
 
     with col2:
         st.metric(label="生存概率", value=f"{probability:.2%}")
+        
+st.sidebar.markdown("--")
+st.sidebar.subheader("快速体验")
+
+col1, col2 = st.sidebar.columns(2)
+if col1.button("女性 头等舱")：
+    st.session_state.pclass = 1
+    st.session_state.sex = "男性"
+    st.session_state.age = 25
+    st.session_state.fare = 8.0
+    st.session_state.sibsp = 0
+    st.session_state.parch = 0
+    st.session_state.embarked = "南安普顿(S)"
+    st.rerun()
+
+if col2.button("男性 三等舱"):
+    st.session_state.pclass = 3
+    st.session_state.sex = "男性"
+    st.session_state.age = 25
+    st.session_state.fare = 8.0
+    st.session_state.sibsp = 0
+    st.session_state.parch = 0
+    st.session_state.embarked = "南安普顿(S)"
+    st.rerun()
+
+st.markdown("---")
+
+pclass = st.selectbox("舱位等级"， [1, 2, 3], key="pclass")
+sex = st.selectbox("性别", ["男性", "女性"], key="sex")
+age = st.slider("年龄", 0, 80, 25, key="age")
 
     st.subheader("预测解释（SHAP）瀑布图")
-    with st.spinner("生成SHAP解释中..."):
+
+    try:
+        import shap
+        import matpltlib.pyplot as plt
 
         explainer = shap.TreeExplainer(model)
         shap_values = explainer.shap_values(input_data)
 
-        fig, ax = plt.subplots(figsize=(10, 4))
-        shap_plot = shap.waterfall_plot(
-            shap.Explanation(
-                values=shap_values[0],
-                base_values=explainer.expected_value,
-                data=input_data.iloc[0],
-                feature_names=input_data.columns.tolist()
-            ),
-            show=False
-        )
-        plt.savefig('shap_pllot.png', bbox_inches='tight')
-        plt.tight_layout()
-        st.pyplot(plt.gcf())
-        plt.clf()
-        st.image("https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f6a2.png", width=80)
+        fig, ax = plt.subplots(figsize=(10, 5))
 
-    st.subheader("全局特征重要性（SHAP Summary Plot）")
-    st.info("注：全局特征重要性图可以在训练阶段生成并保存为图片，这里我们用一个示例代替。")
+        feature_names = input_data.columns.tolist()
+        values = shap_balues[0]
+
+        sorted_idx = np.argsort(np.abs(values))[::-1]
+        sorted_names = [feature_names[i] for i in sorted_idx]
+        sorted_balues = [values[i] for i in sorted_idx]
+
+        colors =['red', if v < 0 else 'blue' for v in sorted_values]
+        plt.barh(sorted_names, sorted_values, color=colors, alpha=0.7)
+        plt.axvline(x=0, color='black', linestyle='-', linewidth=0.5)
+        plt.xlabel('SHAP 值 → 降低生存概率，正值 → 提高生存概率）')
+        plt.title('每个特征对预测结果的贡献')
+        plt.tight_layout()
+
+        st.pyplot(fig)
+        plt.clf()
+       
+    except Exception as e:
+        st.warning(f"SHAP 图生成失败: {e}")
+
+
 
 st.sidebar.markdown("---")
 st.sidebar.caption("基于 XGBoost 模型 | 数据来自 Kaggle Titanic")

@@ -210,33 +210,33 @@ age = st.slider("年龄", 0, 80, 25, key="age")
 
 st.subheader("预测解释（SHAP）瀑布图")
 
-    try:
-        import shap
-        import matpltlib.pyplot as plt
+try:
+    import shap
+    import matpltlib.pyplot as plt
 
-        explainer = shap.TreeExplainer(model)
-        shap_values = explainer.shap_values(input_data)
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(input_data)
 
-        fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(10, 5))
 
-        feature_names = input_data.columns.tolist()
-        values = shap_balues[0]
+    feature_names = input_data.columns.tolist()
+    values = shap_balues[0]
 
-        sorted_idx = np.argsort(np.abs(values))[::-1]
-        sorted_names = [feature_names[i] for i in sorted_idx]
-        sorted_balues = [values[i] for i in sorted_idx]
+    sorted_idx = np.argsort(np.abs(values))[::-1]
+    sorted_names = [feature_names[i] for i in sorted_idx]
+    sorted_balues = [values[i] for i in sorted_idx]
 
-        colors =['red', if v < 0 else 'blue' for v in sorted_values]
-        plt.barh(sorted_names, sorted_values, color=colors, alpha=0.7)
-        plt.axvline(x=0, color='black', linestyle='-', linewidth=0.5)
-        plt.xlabel('SHAP 值 → 降低生存概率，正值 → 提高生存概率）')
-        plt.title('每个特征对预测结果的贡献')
-        plt.tight_layout()
+    colors =['red', if v < 0 else 'blue' for v in sorted_values]
+    plt.barh(sorted_names, sorted_values, color=colors, alpha=0.7)
+    plt.axvline(x=0, color='black', linestyle='-', linewidth=0.5)
+    plt.xlabel('SHAP 值 → 降低生存概率，正值 → 提高生存概率）')
+    plt.title('每个特征对预测结果的贡献')
+    plt.tight_layout()
 
-        st.pyplot(fig)
-        plt.clf()
+    st.pyplot(fig)
+    plt.clf()
        
-    except Exception as e:
+except Exception as e:
         st.warning(f"SHAP 图生成失败: {e}")
 
 
